@@ -19,6 +19,8 @@ public class Server {
 	private int port;
 	// the boolean that will be turned of to stop the server
 	private boolean keepGoing;
+
+	private AcronymDef acs;
 	
 
 	/*
@@ -30,6 +32,7 @@ public class Server {
 	}
 	
 	public Server(int port, ServerGUI sg) {
+		this.acs = new AcronymDef("./res/newAcDef.txt");
 		// GUI or not
 		this.sg = sg;
 		// the port
@@ -95,7 +98,7 @@ public class Server {
 		// connect to myself as Client to exit statement 
 		// Socket socket = serverSocket.accept();
 		try {
-			new Socket("localhost", port);
+			new Socket("50.225.39.74", port);
 		}
 		catch(Exception e) {
 			// nothing I can really do
@@ -117,8 +120,8 @@ public class Server {
 	private synchronized void broadcast(String message) {
 		// add HH:mm:ss and \n to the message
 		
-		System.out.println(message);
-		System.out.println("GGGG");
+		//System.out.println(message);
+		//System.out.println("GGGG");
 		String time = sdf.format(new Date());
 		String messageLf = time + " " + message + "\n";
 		// display message on console or GUI
@@ -160,7 +163,7 @@ public class Server {
 	 */ 
 	public static void main(String[] args) {
 		// start server on port 1500 unless a PortNumber is specified 
-		int portNumber = 1500;
+		int portNumber = 1112;
 		switch(args.length) {
 			case 1:
 				try {
@@ -241,10 +244,33 @@ public class Server {
 				catch(ClassNotFoundException e2) {
 					break;
 				}
-				// the messaage part of the ChatMessage
+				// the message part of the ChatMessage
 				String message = cm.getMessage();
-
-				// Switch on the type of message receive
+				
+				String [] msg=acs.breakMessage(message);
+		
+				
+				for (int i = 0; i< msg.length; i++)
+				{
+					if (acs.checkForArc(msg[i]))
+						msg[i] = msg[i] + " ("+acs.checkAcronym(msg[i]) +") ";
+					else 
+						msg[i] = msg[i] + " ";
+					
+				
+					//System.out.println(msg[i]);
+				}
+				
+				//message = msg.length;
+						
+				StringBuilder builder = new StringBuilder();
+				for(String s : msg) {
+				    builder.append(s);
+				}
+				message = builder.toString();
+				
+				
+				
 				switch(cm.getType()) {
 
 				case ChatMessage.MESSAGE:
